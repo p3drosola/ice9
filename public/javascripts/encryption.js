@@ -26,20 +26,20 @@ function encrypt(file, password){
   reader.readAsArrayBuffer(file);
 }
 
-function decrypt(buffer, base64, password){
+function decrypt(binarystring, base64, password){
   var aes = new pidCrypt.AES.CTR()
-    , crypted = String.fromCharCode.apply(null, new Uint16Array(buffer))
     , cryptedRaw, result;
 
-  aes.initDecrypt(pidCryptUtil.encodeBase64(crypted), password);
+  /* this should be better optimized */
+  aes.initDecrypt(pidCryptUtil.encodeBase64(binarystring), password);
 
-  cryptedRaw = pidCryptUtil.toByteArray(crypted);
+  cryptedRaw = pidCryptUtil.toByteArray(binarystring);
   cryptedRaw = cryptedRaw.slice(8,cryptedRaw.length);
   result = aes.decryptRaw(cryptedRaw);
 
   postMessage({
     msg: 'decrypted'
-  , blob: result
+  , bin_string: result
   });
 
 }

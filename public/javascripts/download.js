@@ -12,7 +12,7 @@
     console.log('downloading ', ice9.file.raw_url);
     var xhr = new XMLHttpRequest();
     xhr.open('GET', ice9.file.raw_url, true);
-    xhr.responseType = 'arraybuffer';
+    xhr.responseType = 'text';
 
     xhr.onload = function(e) {
       if (this.status === 200) {
@@ -21,9 +21,10 @@
         console.log('download complete', this.response, 'decrpyting...');
 
         worker.addEventListener('message', function(e){
-          console.log('decrypted file: ', String.fromCharCode.apply(null, new Uint16Array(e.data)));
-          //var blob_url = window.URL.createObjectURL(e.data.blob);
-          //window.location = blob_url;
+          console.log('decrypted file: ', e.data);
+          var blob = new Blob([e.data.bin_string], {type: ice9.file.type})
+            , blob_url = window.URL.createObjectURL(blob);
+          ice9.download_ready(blob_url);
         });
 
         worker.postMessage({
@@ -37,6 +38,17 @@
     };
 
     xhr.send();
+  };
+
+
+  ice9.download_ready = function (url) {
+
+    var $link = $('<a>')
+          .text('Save "' + ice9.file.name+'"')
+          .attr('download', ice9.file.name)
+          .attr('href', url);
+
+    $('.download').replaceWith($link);
   };
 
 
