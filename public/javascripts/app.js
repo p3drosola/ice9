@@ -74,21 +74,20 @@
   ice9.encrypt = function  (fileList, password, callback) {
 
     _(fileList).each(function(file, cid){
-      var aes = new pidCrypt.AES.CTR()
-        , options = {nBits: 256} // bytes * 8 = bits
-        , reader = new FileReader();
 
-      reader.onload = function(e){
-        var buffer = e.target.result
-          , byteArray = new Uint8Array(buffer)
-          , crypted = aes.encryptRaw(byteArray)
-          , blob = new Blob([crypted], {type: file.type});
+      var worker = new Worker('/javascripts/encrypt_worker.js');
 
-        callback(cid, file.name, blob);
-      };
+      worker.addEventListener('message', function(e){
+        console.log('worker said: ', e.data);
+        callback(cid, file.name, e.data.blob);
+      });
 
-      aes.init(password, options);
-      reader.readAsArrayBuffer(file);
+      worker.postMessage({
+        cid: cid
+      , file: file
+      , password: password
+      });
+
     });
   };
 
