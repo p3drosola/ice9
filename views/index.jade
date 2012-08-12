@@ -1,0 +1,32 @@
+extends layout
+
+block content
+  h1= title
+  p Secure & confidential filesharing powered by client-side encryption.
+
+  #file-input.container
+    label Drop files here
+    ul.file-list
+
+
+    
+  p Now it's time to choose the top-secret password.
+  input.password(type='password', placeholder="encryption passphrase")
+  br
+  br
+  button.encrypt Encrypt & upload
+
+
+
+
+  script(src='/javascripts/libraries/jquery.js')
+  script(src='/javascripts/libraries/underscore.js')
+  script(src='/javascripts/libraries/pidcrypt/pidcrypt.js')
+  script(src='/javascripts/libraries/pidcrypt/pidcrypt_util.js')
+  script(src='/javascripts/libraries/pidcrypt/md5.js')
+  script(src='/javascripts/libraries/pidcrypt/aes_core.js')
+  script(src='/javascripts/libraries/pidcrypt/aes_ctr.js')
+
+
+
+  script(src='/javascripts/app.js')

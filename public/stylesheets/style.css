@@ -1,0 +1,57 @@
+body {
+  padding: 30px 50px;
+  font: 14px/16px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.hidden {
+  display: none;
+}
+
+input, button, textarea {
+  font-size: 14px;
+  padding: 4px;
+}
+
+input[type='password'], input[type='text']{
+  width: 300px;
+}
+
+textarea {
+  width: 300px;
+  min-height: 50px;
+  max-height: 150px;
+  resize: vertical;
+}
+
+.container {
+  border: 3px dashed #E6E6E6;
+  background: #F8F8F8;
+  display: inline-block;
+  border-radius: 10px;
+  margin: 0 20px 20px 0;
+  padding: 20px;
+}
+
+.contianer label {
+  color: #69BEF0;
+}
+
+.drop_target_over {
+  border-color: #4FB2FF;
+}
+
+
+.file-list {
+  padding: 0 0 0 10px;
+  list-style: circle;
+}
+.file-list li {
+  padding: 7px 5px;
+}
+.file-list progress {
+  margin-right: 10px
+}
