@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  h1 Download 
+    | file.name
+  p Powered by ice9. Secure & confidential filesharing powered by client-side encryption.
+
+  button.download Download
+
+  script(src='/javascripts/libraries/jquery.js')
+  script(src='/javascripts/libraries/underscore.js')
+  script(src='/javascripts/download.js')
+
+  - var file_data = JSON.stringify(file)
+  != "<script type='text/javascript'>"
+  != "ice9.file = " +file_data+";"
+  != "</script>"

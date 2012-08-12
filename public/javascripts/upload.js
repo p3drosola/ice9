@@ -75,17 +75,19 @@
 
     _(fileList).each(function(file, cid){
 
-      var worker = new Worker('/javascripts/encrypt_worker.js');
+      var worker = new Worker('/javascripts/encryption.js');
 
       worker.addEventListener('message', function(e){
-        console.log('worker said: ', e.data);
+        console.log('encrypted file: ', e.data.blob);
         callback(cid, file.name, e.data.blob);
       });
 
       worker.postMessage({
-        cid: cid
-      , file: file
-      , password: password
+        msg: 'encrypt'
+      , data: {
+          file: file
+        , password: password
+        }
       });
 
     });
@@ -107,6 +109,15 @@
       if (e.lengthComputable) {
         $prog.val((e.loaded / e.total) * 50 + 50);
       }
+    };
+
+    xhr.onload = function (e){
+      
+      var data = JSON.parse(e.target.response)
+        , $link = $('<a>').attr('href', data[0].public_url).text(data[0].public_url);
+
+      console.log('upload complete', data);
+      $prog.closest('li').append( '<br>download at: ').append($link);
     };
 
     xhr.send(form_data);
