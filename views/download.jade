@@ -1,12 +1,16 @@
 extends layout
 
 block content
-  h1 Download 
-    | file.name
-  p Powered by ice9. Secure & confidential filesharing powered by client-side encryption.
+  h1= file.name
+  
+  .confirm-password
+    p Enter the password to download this file.
+      | Note that if the password is incorrect, you will recieve a corrupted file.
+    input.password(type='password', placeholder="password")
 
   button.download Download
-
+  br
+  br
   script(src='/javascripts/libraries/jquery.js')
   script(src='/javascripts/libraries/underscore.js')
   script(src='/javascripts/download.js')

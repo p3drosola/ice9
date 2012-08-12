@@ -9,8 +9,8 @@
   ice9.initialize = function (){
 
     $(document)
-      .on('dragenter', '.container', ice9.drag_enter)
-      .on('dragleave', '.container', ice9.drag_leave)
+      .on('dragenter', '#file-input', ice9.drag_enter)
+      .on('dragleave', '#file-input', ice9.drag_leave)
       .on('drop', '#file-input', ice9.file_drop)
       .on('click', '.encrypt', ice9.encrypt_btn)
     ;
@@ -18,11 +18,11 @@
   };
 
   ice9.drag_enter = function (e) {
-    $(e.target).addClass('drop_target_over');
+    $('#file-input').addClass('drop_target_over');
   };
 
   ice9.drag_leave = function (e) {
-    $(e.target).removeClass('drop_target_over');
+    $('#file-input').removeClass('drop_target_over');
   };
 
   ice9.file_drop = function (e){
@@ -30,20 +30,32 @@
 
     ice9.drag_leave(e);
     files = e.originalEvent.dataTransfer.files;
-    $(e.target).find('label').hide();
+    $('#file-input').removeClass('empty');
 
     _(files).each(function(file){
       var $el, cid = _.uniqueId();
 
-      $el = $('<li><progress value="0" max="100" style="display:none"/></li>');
-      $el.append(file.name).attr('data-cid', cid);
+      $el = $('<li>'
+        + '<div class="progress-round pause">'
+          + '<div class="ball"></div>'
+          + '<div class="ball1"></div>'
+        +'</div>'
+        + '<div class="name"></div>'
+        + '<div class="status">waiting...</div>'
+        + '<div class="progress-linear"></div>'
+        + '</li>');
+
+      $el.attr('data-cid', cid)
+         .find('.name').text(file.name);
+
 
 
       $('.file-list').append($el);
       ice9.files[cid] = file;
     });
 
-    $('.key-info').show();
+    $('.choose-password').fadeIn();
+    $('.password').focus();
 
     return false; // prevent redirect + stop propagation
   };
@@ -54,6 +66,9 @@
       alert('Please type a password');
       return;
     }
+    $('.choose-password').slideUp();
+    $('.file-list .progress-round' ).removeClass('pause');
+    $('.file-list .status').text('Encrypting...');
     ice9.encrypt(ice9.files, password, ice9.upload_file);
   };
 
@@ -97,31 +112,38 @@
   ice9.upload_file = function (cid, name, file){
 
     console.log("uploading", name, file);
-    
-    var xhr = new XMLHttpRequest()
-      , form_data = new FormData()
-      , $prog = $('.file-list li[data-cid='+cid+'] progress').val(0).show();
+    ice9.text_status(cid, 'Uploading...');
 
+    var xhr = new XMLHttpRequest()
+      , form_data = new FormData();
     form_data.append(name, file);
     xhr.open('POST', '/upload', true);
 
     xhr.upload.onprogress = function(e) {
       if (e.lengthComputable) {
-        $prog.val((e.loaded / e.total) * 50 + 50);
+        var done = (e.loaded / e.total) * 100;
+        ice9.text_status(cid, 'Uploaded '+done+'%');
       }
     };
 
     xhr.onload = function (e){
       
       var data = JSON.parse(e.target.response)
-        , $link = $('<a>').attr('href', data[0].public_url).text(data[0].public_url);
+        , link = 'Encrypted Download Link: <pre>http://'
+           + location.host + data[0].public_url+'</pre>';
 
       console.log('upload complete', data);
-      $prog.closest('li').append( '<br>download at: ').append($link);
+
+      $('.file-list li[data-cid='+cid+'] .progress-round').addClass('pause');
+      ice9.text_status(cid, link);
     };
 
     xhr.send(form_data);
  
+  };
+
+  ice9.text_status = function(cid, status){
+    $('.file-list li[data-cid='+cid+'] .status').html(status);
   };
 
 

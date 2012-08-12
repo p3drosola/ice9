@@ -30,16 +30,13 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(app.router);
-  app.use(express.static(path.join(__dirname, 'public')));
+  //app.use(require('less').middleware(__dirname + '/public'));
+  app.use(express['static'](path.join(__dirname, 'public')));
 });
 
 app.configure('development', function(){
   app.use(express.errorHandler());
 });
-
-
-
-
 
 
 
