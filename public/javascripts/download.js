@@ -8,18 +8,34 @@
 
 
   ice9.download = function(){
-    ice9.password = prompt('Password');
+    ice9.password = $('.password').val();
+
+    if ($.trim(ice9.password) === '') {
+      alert('Please enter the password');
+      return;
+    }
+
     console.log('downloading ', ice9.file.raw_url);
+    $('.confirm-password, .download').hide();
+    $('.progress-round').removeClass('pause');
+    $('.status').removeClass('hidden');
     var xhr = new XMLHttpRequest();
     xhr.open('GET', ice9.file.raw_url, true);
     xhr.responseType = 'text';
+
+    xhr.onprogress = function(e){
+      if (e.lengthComputable) {
+        var done = (e.loaded / e.total) * 100;
+        $('.status').text('Downloaded '+done+'%');
+      }
+    }
 
     xhr.onload = function(e) {
       if (this.status === 200) {
         var worker = new Worker('/javascripts/encryption.js');
         //new Blob([this.response], {type: ice9.file.type})
         console.log('download complete', this.response, 'decrpyting...');
-
+        $('.status').text('Decrypting...');
         worker.addEventListener('message', function(e){
           console.log('decrypted file: ', e.data);
           var blob = new Blob([e.data.bin_string], {type: ice9.file.type})
@@ -42,13 +58,14 @@
 
 
   ice9.download_ready = function (url) {
-
+    $('.status').text('Decrypted.');
+    $('.progress-round').addClass('pause');
     var $link = $('<a>')
-          .text('Save "' + ice9.file.name+'"')
+          .text('Click here to save file.')
           .attr('download', ice9.file.name)
           .attr('href', url);
 
-    $('.download').replaceWith($link);
+    $('.status').html($link);
   };
 
 

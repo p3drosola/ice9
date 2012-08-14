@@ -3,6 +3,14 @@ extends layout
 block content
   h1= file.name
   
+  .results
+    .progress-round.pause.hidden
+      .ball
+      .ball1
+
+    .status.hidden Downloading...
+
+
   .confirm-password
     p Enter the password to download this file.
       | Note that if the password is incorrect, you will recieve a corrupted file.

@@ -91,6 +91,15 @@ body {
   padding: 10px;
 }
 
+.results {
+  text-align: center;
+}
+
+.results .progress-round {
+  float: none;
+  display: inline-block;
+}
+
 input[type=password] ,
 input[type=text]{
   width: 100%;
