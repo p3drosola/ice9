@@ -4,57 +4,71 @@ importScripts('/javascripts/libraries/pidcrypt/pidcrypt.js',
   '/javascripts/libraries/pidcrypt/aes_core.js',
   '/javascripts/libraries/pidcrypt/aes_ctr.js');
 
-function encrypt(file, password){
 
-  var aes = new pidCrypt.AES.CTR()
-    , options = {nBits: 256} // keylength
-    , reader = new FileReader();
+var aes_options = {nBits: 256};
 
+/**
+ * Converts a File object to a binary string
+ * @param  {File}   file
+ * @param  {Function} callback is passed  the binary string as the only argument
+ */
+function file_to_string (file, callback) {
+  var reader = new FileReader();
   reader.onload = function(e){
-    var buffer = e.target.result
-      , byteArray = new Uint8Array(buffer)
-      , crypted = aes.encryptRaw(byteArray)
-      , blob = new Blob([crypted], {type: file.type})
+    callback(e.target.result);
+  }
+  reader.readAsBinaryString(file);
+}
+
+/**
+ * Encrypts a file & posts a worker response with an encrypted blob
+ * @param  {File} file
+ * @param  {String} password
+ */
+function encrypt (file, password) {
+  file_to_string(file, function (bin_string) {
+    var aes, crypted_bin_string, blob;
+    aes = new pidCrypt.AES.CTR();
+    aes.initEncrypt(bin_string, password, aes_options);
+    crypted_bin_string = aes.encrypt(bin_string);
+    blob = new Blob([crypted_bin_string], {type: file.type})
 
     postMessage({
       msg: 'encrypted'
     , blob: blob
     });
-  };
-
-  aes.init(password, options);
-  reader.readAsArrayBuffer(file);
+  });
 }
 
-function decrypt(binarystring, base64, password){
-  var aes = new pidCrypt.AES.CTR()
-    , cryptedRaw, result;
+/**
+ * Decrypts a binary string, posts result as a Blob
+ * @param  {String} bin_string
+ * @param  {String} type mime type of the file
+ * @param  {String} password
+ */
+function decrypt(bin_string, file_type, password){
+  var aes, clear_bin_string, blob;
 
-  /* this should be better optimized */
-  aes.initDecrypt(pidCryptUtil.encodeBase64(binarystring), password);
-
-  cryptedRaw = pidCryptUtil.toByteArray(binarystring);
-  cryptedRaw = cryptedRaw.slice(8,cryptedRaw.length);
-  result = aes.decryptRaw(cryptedRaw);
+  aes = new pidCrypt.AES.CTR()
+  aes.initDecrypt(bin_string, password, aes_options);
+  clear_bin_string = aes.decrypt();
+  blob = new Blob([clear_bin_string], {type: file_type});
 
   postMessage({
     msg: 'decrypted'
-  , bin_string: result
+  , blob: blob
   });
 
 }
 
 
 this.addEventListener('message', function(e){
-
   switch(e.data.msg){
     case 'encrypt':
       encrypt(e.data.data.file, e.data.data.password);
     break;
     case 'decrypt':
-      decrypt(e.data.data.buffer, e.data.data.base64, e.data.data.password);
+      decrypt(e.data.data.bin_string, e.data.data.type, e.data.data.password);
     break;
   }
-  
-  
 });
