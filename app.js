@@ -45,6 +45,8 @@ app.configure('development', function(){
 
 app.get('/', routes.index);
 
+app.get('/test', routes.test);
+
 app.post('/upload', function (req, res) {
   
   var complete = util.parallel();

@@ -11,6 +11,7 @@
     $(document)
       .on('dragenter', '#file-input', ice9.drag_enter)
       .on('dragleave', '#file-input', ice9.drag_leave)
+      .on('drop', function(){ return false; }) // disable redirect
       .on('drop', '#file-input', ice9.file_drop)
       .on('click', '.encrypt', ice9.encrypt_btn)
     ;
@@ -90,19 +91,16 @@
 
     _(fileList).each(function(file, cid){
 
-      var worker = new Worker('/javascripts/encryption.js');
+      var worker = new Worker('/javascripts/encrypt.js');
 
       worker.addEventListener('message', function(e){
-        console.log('encrypted file: ', e.data.blob);
-        callback(cid, file.name, e.data.blob);
+        console.log('encrypt worker returned message: ', arguments);
+        ice9.upload_file(cid, file.name, e.data.blob);
       });
 
       worker.postMessage({
-        msg: 'encrypt'
-      , data: {
-          file: file
-        , password: password
-        }
+        file: file
+      , password: password
       });
 
     });

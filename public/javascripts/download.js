@@ -21,7 +21,7 @@
     $('.status').removeClass('hidden');
     var xhr = new XMLHttpRequest();
     xhr.open('GET', ice9.file.raw_url, true);
-    xhr.responseType = 'text'; // redundant, is default
+    xhr.responseType = 'arraybuffer';
 
     xhr.onprogress = function(e){
       if (e.lengthComputable) {
@@ -32,7 +32,7 @@
 
     xhr.onload = function(e) {
       if (this.status === 200) {
-        var worker = new Worker('/javascripts/encryption.js');
+        var worker = new Worker('/javascripts/decrypt.js');
 
         console.log('download complete', this.response, 'decrpyting...');
         $('.status').text('Decrypting...');
@@ -44,12 +44,9 @@
         });
 
         worker.postMessage({
-          msg: 'decrypt'
-        , data: {
-            bin_string: this.responseText
+            arrayBuffer: this.response
           , type: ice9.file.type
           , password: ice9.password
-          }
         });
       }
     };

@@ -206,3 +206,18 @@ h1 {
   -moz-animation:spinoff .9s infinite linear;
   -webkit-animation:spinoff .9s infinite linear;
 }
+
+
+
+
+.debug p,
+.debug pre {
+  margin: 10px 0px;
+  box-sizing: border-box;
+  display: inline-block;
+  width: 40%;
+}
+
+.debug p:nth-child(3n) {
+  display: none;
+}
