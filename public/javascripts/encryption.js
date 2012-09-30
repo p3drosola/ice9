@@ -28,9 +28,10 @@ function file_to_string (file, callback) {
 function encrypt (file, password) {
   file_to_string(file, function (bin_string) {
     var aes, crypted_bin_string, blob;
+
     aes = new pidCrypt.AES.CTR();
-    aes.initEncrypt(bin_string, password, aes_options);
-    crypted_bin_string = aes.encrypt(bin_string);
+    aes.init(password, aes_options);
+    crypted_bin_string = aes.encryptRaw(bin_string); 
     blob = new Blob([crypted_bin_string], {type: file.type})
 
     postMessage({
@@ -50,8 +51,8 @@ function decrypt(bin_string, file_type, password){
   var aes, clear_bin_string, blob;
 
   aes = new pidCrypt.AES.CTR()
-  aes.initDecrypt(bin_string, password, aes_options);
-  clear_bin_string = aes.decrypt();
+  aes.init(password, aes_options);
+  clear_bin_string = aes.decryptRaw(bin_string);
   blob = new Blob([clear_bin_string], {type: file_type});
 
   postMessage({
