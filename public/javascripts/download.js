@@ -4,6 +4,11 @@
 
   ice9.initialize = function(){
     $(document).on('click', '.download', this.download);
+
+    var match = location.href.match(/iv\\?=([^&]*)/);
+    if (match && match[1]){
+      this.iv = match[1];
+    }
   };
 
 
@@ -47,6 +52,7 @@
             arrayBuffer: this.response
           , type: ice9.file.type
           , password: ice9.password
+          , iv: ice9.iv
         });
       }
     };

@@ -95,7 +95,8 @@
 
       worker.addEventListener('message', function(e){
         console.log('encrypt worker returned message: ', arguments);
-        ice9.upload_file(cid, file.name, e.data.blob);
+        alert("key: "+e.data.key);
+        ice9.upload_file(cid, file.name, e.data.blob, e.data.iv);
       });
 
       worker.postMessage({
@@ -107,7 +108,7 @@
   };
 
 
-  ice9.upload_file = function (cid, name, file){
+  ice9.upload_file = function (cid, name, file, iv){
 
     console.log("uploading", name, file);
     ice9.text_status(cid, 'Uploading...');
@@ -125,10 +126,9 @@
     };
 
     xhr.onload = function (e){
-      
       var data = JSON.parse(e.target.response)
-        , link = 'Encrypted Download Link: <pre>http://'
-           + location.host + data[0].public_url+'</pre>';
+        , href = 'http://'+ location.host + data[0].public_url +'?iv='+iv
+        , link = $('<a>').attr('href', href).text('Encrypted Download Link: '+ href);
 
       console.log('upload complete', data);
 

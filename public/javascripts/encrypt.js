@@ -8,15 +8,21 @@ function encrypt (event){
 
   reader.onload = function(e){
     var arrayBuffer = e.target.result;
-    var byteArray = new Uint8Array(arrayBuffer);
+    var byteArray = new Int32Array(arrayBuffer);
     var wordArray = CryptoJS.lib.WordArray.create(byteArray);
     var encrypted = CryptoJS.AES.encrypt(wordArray, password);
-    var words = CryptoJS.enc.Base64.parse(encrypted.toString()).words;
-    var blob = new Blob(words, {type: file.type});
+
+    var buffer = new ArrayBuffer(encrypted.ciphertext.words.length*4);
+    var view = new Int32Array(buffer);
+
+    for (var i=0; i<encrypted.ciphertext.words.length; i++){
+      view[i] = encrypted.ciphertext.words[i];
+    }
+    var blob = new Blob([view], {type: file.type});
 
     postMessage({
-     key: encrypted.key.toString()
-   , iv: encrypted.iv.toString()
+     key: CryptoJS.enc.Base64.stringify(encrypted.key)
+   , iv: CryptoJS.enc.Base64.stringify(encrypted.iv)
    , blob: blob
    });
   }
